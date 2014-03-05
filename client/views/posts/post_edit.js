@@ -1,6 +1,7 @@
 Template.postEdit.helpers({
   post: function() {
-    return Posts.findOne({id: Session.get('currentPostId')});
+    console.log("currentPostId: "+Session.get('currentPostId'));
+    return Posts.findOne(Session.get('currentPostId'));
   }
 });
 Template.postEdit.events({

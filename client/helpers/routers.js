@@ -1,7 +1,12 @@
 Router.configure({
   layoutTemplate: 'layout',
   loadingTemplate: 'loading',
-  waitOn: function() { return Meteor.subscribe('posts'); },
+  waitOn: function() { 
+    return [ 
+      Meteor.subscribe('posts'), 
+      Meteor.subscribe('notifications'), 
+    ] ; 
+  },
 });
 
 Router.map(function(){
@@ -11,10 +16,13 @@ Router.map(function(){
 
   this.route('postPage', {
     path: '/posts/:_id',
+    waitOn: function() {
+      return Meteor.subscribe('comments', this.params._id);
+    },
     data: function() {
       Session.set('currentPostId', this.params._id);
       return Posts.findOne(this.params._id);
-    }
+    },
   });    
 
   this.route('postEdit',{
@@ -41,5 +49,6 @@ Router.map(function(){
   };
 
   Router.before(requireLogin, {only: 'postSubmit'});
+  Router.before(function() { cleanErrors() });
 
 });

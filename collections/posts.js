@@ -1,6 +1,10 @@
 Posts = new Meteor.Collection('posts');
 
-Posts.deny({});
+Posts.deny({
+  update: function(userId, post, fieldNames) {
+    return (_.without(fieldNames, 'url', 'title').length > 0);
+  },
+});
 
 Posts.allow({
   update: ownsDocument,

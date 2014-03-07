@@ -1,7 +1,12 @@
 Template.postEdit.helpers({
   post: function() {
-    console.log("currentPostId: "+Session.get('currentPostId'));
-    return Posts.findOne(Session.get('currentPostId'));
+    var currentPostId = Session.get('currentPostId');
+    var currentPost = Posts.findOne(currentPostId); 
+    
+    if (! ownsDocument(Meteor.userId(),currentPost) )
+      Router.go('postPage', {_id: currentPostId});
+
+    return currentPost;
   }
 });
 Template.postEdit.events({

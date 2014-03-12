@@ -1,3 +1,5 @@
+PLC = RouterController.extend({});
+
 Router.configure({
   layoutTemplate: 'layout',
   loadingTemplate: 'loading',

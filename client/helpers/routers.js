@@ -1,4 +1,23 @@
-PLC = RouterController.extend({});
+PLC = RouteController.extend({
+  template: 'postsList',
+  increment: 5 ,
+  postsLimit: function() {
+    return parseInt(this.params.postsLimit) || this.increment ;
+  },
+  findOptions: function() {
+    return {
+      limit: this.postsLimit(),
+    };
+  },
+  waitOn: function() {
+    return Meteor.subscribe('posts', this.findOptions());
+  },
+  data: function() {
+    return {
+      posts: Posts.find({}, this.findOptions()),
+    };
+  },
+});
 
 Router.configure({
   layoutTemplate: 'layout',
@@ -18,6 +37,7 @@ Router.map(function(){
     },
     data: function() {
       Session.set('currentPostId', this.params._id);
+      Session.set('currentPost', this.params._id);
       return Posts.findOne(this.params._id);
     },
   });    
@@ -36,16 +56,7 @@ Router.map(function(){
 
   this.route('postsList', {
     path: '/:postsLimit?',
-    waitOn: function() {
-      var postsLimit = parseInt(this.params.postsLimit) || 5 ;
-      return Meteor.subscribe('posts', postsLimit);
-    },
-    data: function() {
-      var limit = parseInt(this.params.postsLimit) || 5 ;
-      return {
-        posts: Posts.find({}, {sort: {submitted: -1}, limit: limit})
-      };
-    },
+    controller: PLC,
   });
 
   var requireLogin = function(){

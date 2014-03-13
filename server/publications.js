@@ -1,5 +1,5 @@
-Meteor.publish('posts', function(postsLimit){
-  return Posts.find({}, {limit: postsLimit});
+Meteor.publish('posts', function(opts){
+  return Posts.find({}, opts);
 });
 
 Meteor.publish('comments', function(postId){

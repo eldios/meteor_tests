@@ -15,6 +15,7 @@ PLC = RouteController.extend({
   data: function() {
     return {
       posts: Posts.find({}, this.findOptions()),
+      nextPath: this.route.path({postsLimit: this.postsLimit() + this.increment}),
     };
   },
 });
@@ -22,10 +23,10 @@ PLC = RouteController.extend({
 Router.configure({
   layoutTemplate: 'layout',
   loadingTemplate: 'loading',
-  waitOn: function() { 
-    return [ 
-      Meteor.subscribe('notifications'), 
-    ] ; 
+  waitOn: function() {
+    return [
+      Meteor.subscribe('notifications'),
+    ] ;
   },
 });
 
@@ -33,25 +34,30 @@ Router.map(function(){
   this.route('postPage', {
     path: '/posts/:_id',
     waitOn: function() {
-      return Meteor.subscribe('comments', this.params._id);
+      return [
+        Meteor.subscribe('singlePost', this.params._id),
+        Meteor.subscribe('comments', this.params._id),
+      ];
     },
     data: function() {
-      Session.set('currentPostId', this.params._id);
-      Session.set('currentPost', this.params._id);
       return Posts.findOne(this.params._id);
     },
-  });    
+  });
 
   this.route('postEdit',{
     path: '/posts/:_id/edit',
+    waitOn: function() {
+      return Meteor.subscribe('singlePost', this.params._id);
+    },
     data: function(){
-      Session.set('currentPostId', this.params._id);
+      console.log(this.params._id);
       return Posts.findOne(this.params._id);
-    }, 
+    },
   });
 
   this.route('postSubmit', {
-    path: '/submit'
+    path: '/submit',
+    disableProgress: true,
   });
 
   this.route('postsList', {
@@ -72,5 +78,4 @@ Router.map(function(){
 
   Router.before(requireLogin, {only: 'postSubmit'});
   Router.before(function() { cleanErrors() });
-
 });

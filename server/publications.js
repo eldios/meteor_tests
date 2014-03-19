@@ -3,7 +3,7 @@ Meteor.publish('posts', function(opts){
 });
 
 Meteor.publish('singlePost', function(id){
-  return id && Posts.findOne(id);
+  return id && Posts.find(id);
 });
 
 Meteor.publish('comments', function(postId){

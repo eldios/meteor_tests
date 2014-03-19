@@ -1,4 +1,4 @@
-PLC = RouteController.extend({
+PostListController = RouteController.extend({
   template: 'postsList',
   increment: 5 ,
   postsLimit: function() {
@@ -6,6 +6,7 @@ PLC = RouteController.extend({
   },
   findOptions: function() {
     return {
+      sort:  this.sort,
       limit: this.postsLimit(),
     };
   },
@@ -20,6 +21,20 @@ PLC = RouteController.extend({
   },
 });
 
+NewPostListController = PostListController.extend({
+  sort: { submitted: -1 , _id: -1 },
+  nextPath: function(){
+    return Router.routes.newPosts.path({postsLimit: this.postsLimit() + this.increment});
+  },
+});
+
+BestPostListController = PostListController.extend({
+  sort: { votes: -1 , submitted: -1 , _id: -1 },
+  nextPath: function(){
+    return Router.routes.bestPosts.path({postsLimit: this.postsLimit() + this.increment});
+  },
+});
+
 Router.configure({
   layoutTemplate: 'layout',
   loadingTemplate: 'loading',
@@ -31,6 +46,21 @@ Router.configure({
 });
 
 Router.map(function(){
+  this.route('home', {
+    path: '/',
+    controller: NewPostListController,
+  });
+
+  this.route('newPosts', {
+    path: '/new/:postsLimit?',
+    controller: NewPostListController,
+  });
+
+  this.route('bestPosts', {
+    path: '/best/:postsLimit?',
+    controller: BestPostListController,
+  });
+
   this.route('postPage', {
     path: '/posts/:_id',
     waitOn: function() {
@@ -62,7 +92,7 @@ Router.map(function(){
 
   this.route('postsList', {
     path: '/:postsLimit?',
-    controller: PLC,
+    controller: PostListController,
   });
 
   var requireLogin = function(){
